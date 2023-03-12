@@ -43,7 +43,7 @@ class SimpleTable(ScrolledFrame):
         self.table = Table(self.interior)
         self.table.pack()
 
-        self.table.add_row(get_title_row_generator(0)) # to mark the title row
+        self.table.add_row(get_title_row_generator(0))  # to mark the title row
 
         self.footer = tk.Frame(self.interior)
         self.footer.pack(side=BOTTOM)
@@ -55,14 +55,18 @@ class SimpleTable(ScrolledFrame):
         self.right_click_menu.add_command(label="New", command=self._add_row)
 
         # dynamic bind right mouse to open menu
-        self.interior.bind("<Enter>", lambda event: self.canvas.bind_all("<Button-3>", self._show_menu))
-        self.interior.bind("<Leave>", lambda event: self.canvas.unbind_all("<Button-3>"))
+        self.interior.bind(
+            "<Enter>", lambda event: self.canvas.bind_all("<Button-3>", self._show_menu)
+        )
+        self.interior.bind(
+            "<Leave>", lambda event: self.canvas.unbind_all("<Button-3>")
+        )
 
         self.read_only = read_only
         self.new_row_generator = None
 
     def _show_menu(self, event):
-        #print(event.widget)
+        # print(event.widget)
         try:
             self.right_click_menu.tk_popup(event.x_root, event.y_root)
         finally:
@@ -101,6 +105,7 @@ class SimpleTable(ScrolledFrame):
             return
 
         self.new_row_generator()
+
 
 if __name__ == "__main__":
 
