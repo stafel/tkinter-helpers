@@ -18,14 +18,15 @@
 #
 
 import tkinter as tk
-from tkinter import Label, ttk
+from tkinter import ttk
 from tkinter.constants import *
 
 __doc__ = """
 Simple table for data
 """
 
-def get_readonly_row_generator(columns:int):
+
+def get_readonly_row_generator(columns: int):
     """
     returns generator method for a read only row consisting of labels
     """
@@ -34,13 +35,16 @@ def get_readonly_row_generator(columns:int):
         widgets = []
         for column_position in range(columns):
             label = tk.Label(parent)
-            label.grid(row=row_position, column=column_position, sticky=NSEW, padx=1, pady=1)
+            label.grid(
+                row=row_position, column=column_position, sticky=NSEW, padx=1, pady=1
+            )
             widgets.append(label)
         return widgets
 
     return _generate_row
 
-def get_input_row_generator(columns:int):
+
+def get_input_row_generator(columns: int):
     """
     returns generator method for a input row consisting of entry text boxes
     """
@@ -48,19 +52,22 @@ def get_input_row_generator(columns:int):
     def _generate_row(parent, row_position):
         widgets = []
         for column_position in range(columns):
-            label = tk.Entry(parent, justify='center')
-            label.grid(row=row_position, column=column_position, sticky=NSEW, padx=1, pady=1)
+            label = tk.Entry(parent, justify="center")
+            label.grid(
+                row=row_position, column=column_position, sticky=NSEW, padx=1, pady=1
+            )
             widgets.append(label)
         return widgets
 
     return _generate_row
+
 
 class Table(tk.Frame):
     """
     Simple table for data
     """
 
-    def __init__(self, parent, rows:int, row_generator):
+    def __init__(self, parent, rows: int, row_generator):
         tk.Frame.__init__(self, parent)
 
         self.widgets = []
@@ -76,7 +83,7 @@ class Table(tk.Frame):
         self.rows += 1
         self.widgets.append(row_generator(parent=self, row_position=self.rows))
 
-    def set(self, row:int, column:int, value):
+    def set(self, row: int, column: int, value):
         """
         Sets cell on position row column to value
         """
@@ -88,7 +95,7 @@ class Table(tk.Frame):
             widget.delete(0, END)
             widget.insert(0, value)
 
-    def get(self, row:int, column:int):
+    def get(self, row: int, column: int):
         """
         Returns value from cell on position row column
         """
@@ -96,10 +103,10 @@ class Table(tk.Frame):
         widget = self.widgets[row][column]
         if isinstance(widget, tk.Label):
             return widget.cget("text")
-        elif isinstance(widget, tk.Entry):
+        if isinstance(widget, tk.Entry):
             return widget.get()
 
-    def get_row(self, row:int):
+    def get_row(self, row: int):
         """
         Returns values as list for row
         """
@@ -108,6 +115,7 @@ class Table(tk.Frame):
         for column in range(len(self.widgets[row])):
             values.append(self.get(row, column))
         return values
+
 
 if __name__ == "__main__":
 
@@ -131,10 +139,16 @@ if __name__ == "__main__":
                 for column in range(3):
                     self.table.set(row, column, f"test {row} {column}")
 
-            self.button = tk.Button(self, text="get pos 1,1", command=lambda: print(self.table.get(1,1)))
+            self.button = tk.Button(
+                self, text="get pos 1,1", command=lambda: print(self.table.get(1, 1))
+            )
             self.button.pack()
 
-            self.button_end = tk.Button(self, text="get last row", command=lambda: print(self.table.get_row(self.table.rows-1)))
+            self.button_end = tk.Button(
+                self,
+                text="get last row",
+                command=lambda: print(self.table.get_row(self.table.rows - 1)),
+            )
             self.button_end.pack()
 
     app = SampleApp()
