@@ -33,19 +33,25 @@ class ScrolledFrame(ttk.Frame):
     Based on https://web.archive.org/web/20170514022131id_/http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
     """
 
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, show_vertical_scrollbar:bool=True, show_horizontal_scrollbar:bool=False, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
 
         # create canvas and scrollbar for it
-        vertical_scrollbar = ttk.Scrollbar(self, orient=VERTICAL)
-        vertical_scrollbar.pack(fill=Y, side=RIGHT, expand=FALSE)
+        self.vertical_scrollbar = ttk.Scrollbar(self, orient=VERTICAL)
+        self.vertical_scrollbar_visible = False
+        self.show_vertical_scrollbar(show_vertical_scrollbar)
+
+        self.horizontal_scrollbar = ttk.Scrollbar(self, orient=HORIZONTAL)
+        self.horizontal_scrollbar_visible = False
+        self.show_horizontal_scrollbar(show_horizontal_scrollbar)
 
         self.canvas = tk.Canvas(
-            self, bd=0, highlightthickness=0, yscrollcommand=vertical_scrollbar.set
+            self, bd=0, highlightthickness=0, yscrollcommand=self.vertical_scrollbar.set, xscrollcommand=self.horizontal_scrollbar.set
         )
         self.canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
-        vertical_scrollbar.config(command=self.canvas.yview)
+        self.vertical_scrollbar.config(command=self.canvas.yview)
+        self.horizontal_scrollbar.config(command=self.canvas.xview)
 
         # reset the view to pos 0,0
         self.canvas.xview_moveto(0)
@@ -77,6 +83,28 @@ class ScrolledFrame(ttk.Frame):
         # dynamic bind scroll wheel if mouse over
         self.interior.bind("<Enter>", self._bind_mousewheel)
         self.interior.bind("<Leave>", self._unbind_mousewheel)
+
+    def show_vertical_scrollbar(self, visible:bool):
+        """
+        Show or hide vertical scrollbar
+        """
+
+        self.vertical_scrollbar_visible = visible
+        if visible:
+            self.vertical_scrollbar.pack(fill=Y, side=RIGHT, expand=FALSE)
+        else:
+            self.vertical_scrollbar.pack_forget()
+
+    def show_horizontal_scrollbar(self, visible:bool):
+        """
+        Show or hide horizontal scrollbar
+        """
+
+        self.horizontal_scrollbar_visible = visible
+        if visible:
+            self.horizontal_scrollbar.pack(fill=X, side=BOTTOM, expand=FALSE)
+        else:
+            self.horizontal_scrollbar.pack_forget()
 
     def _on_scroll(self, event):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), UNITS)
