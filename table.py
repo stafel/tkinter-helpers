@@ -26,7 +26,7 @@ Simple table for data
 """
 
 
-def get_readonly_row_generator(columns: int):
+def get_readonly_row_generator(columns: int, **kwargs):
     """
     returns generator method for a read only row consisting of labels
     """
@@ -34,7 +34,7 @@ def get_readonly_row_generator(columns: int):
     def _generate_row(parent, row_position):
         widgets = []
         for column_position in range(columns):
-            label = tk.Label(parent)
+            label = tk.Label(parent, **kwargs)
             label.grid(
                 row=row_position, column=column_position, sticky=NSEW, padx=1, pady=1
             )
@@ -44,7 +44,15 @@ def get_readonly_row_generator(columns: int):
     return _generate_row
 
 
-def get_input_row_generator(columns: int):
+def get_title_row_generator(columns: int, **kwargs):
+    """
+    returns generator method for title row
+    """
+
+    return get_readonly_row_generator(columns, font=("Helvetica", 14, "bold"), **kwargs)
+
+
+def get_input_row_generator(columns: int, **kwargs):
     """
     returns generator method for a input row consisting of entry text boxes
     """
@@ -52,7 +60,7 @@ def get_input_row_generator(columns: int):
     def _generate_row(parent, row_position):
         widgets = []
         for column_position in range(columns):
-            label = tk.Entry(parent, justify="center")
+            label = tk.Entry(parent, **kwargs)
             label.grid(
                 row=row_position, column=column_position, sticky=NSEW, padx=1, pady=1
             )
@@ -62,18 +70,24 @@ def get_input_row_generator(columns: int):
     return _generate_row
 
 
+def get_input_row_generator_centered(columns: int, **kwargs):
+    """
+    returns generator method for a input row consisting of centered text entry text boxes
+    """
+
+    return get_input_row_generator(columns, justify="center", **kwargs)
+
+
 class Table(tk.Frame):
     """
     Simple table for data
     """
 
-    def __init__(self, parent, rows: int, row_generator):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
         self.widgets = []
-        self.rows = rows
-        for row in range(rows):
-            self.widgets.append(row_generator(parent=self, row_position=row))
+        self.rows = 0
 
     def add_row(self, row_generator):
         """
@@ -82,6 +96,14 @@ class Table(tk.Frame):
 
         self.rows += 1
         self.widgets.append(row_generator(parent=self, row_position=self.rows))
+
+    def add_rows(self, number_of_rows: int, row_generator):
+        """
+        Adds a number of rows at the end of the table from generator
+        """
+
+        for row in range(number_of_rows):
+            self.add_row(row_generator)
 
     def set(self, row: int, column: int, value):
         """
@@ -127,15 +149,15 @@ if __name__ == "__main__":
         def __init__(self, *args, **kwargs):
             tk.Tk.__init__(self, *args, **kwargs)
 
-            self.table = Table(self, 15, get_readonly_row_generator(3))
-            self.table.add_row(get_input_row_generator(3))
+            self.table = Table(self)
+            self.table.add_row(get_title_row_generator(3))
+            self.table.add_rows(15, get_readonly_row_generator(3))
+            self.table.add_row(get_input_row_generator_centered(3))
             self.table.pack()
-            self.label = ttk.Label(
-                self, text="Buttons output values to console."
-            )
+            self.label = ttk.Label(self, text="Buttons output values to console.")
             self.label.pack()
 
-            for row in range(16):
+            for row in range(17):
                 for column in range(3):
                     self.table.set(row, column, f"test {row} {column}")
 
