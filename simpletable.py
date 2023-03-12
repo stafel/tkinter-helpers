@@ -20,7 +20,7 @@
 import tkinter as tk
 from tkinter.constants import *
 from scrollframe import ScrolledFrame
-from table import Table, get_title_row_generator, get_readonly_row_generator
+from table import Table, get_title_row_generator, get_readonly_row_generator, get_input_row_generator_centered
 
 __doc__ = """
 Simple table for data
@@ -32,11 +32,13 @@ class SimpleTable(ScrolledFrame):
     Simple scrollable table
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, read_only:bool=True):
         ScrolledFrame.__init__(self, parent)
 
         self.table = Table(self.interior)
         self.table.pack()
+
+        self.read_only = read_only
 
     def set_title(self, title_texts):
         """
@@ -53,7 +55,10 @@ class SimpleTable(ScrolledFrame):
 
         for row in data_rows:
             columns = len(row)
-            self.table.add_row(get_readonly_row_generator(columns))
+            if self.read_only:
+                self.table.add_row(get_readonly_row_generator(columns))
+            else:
+                self.table.add_row(get_input_row_generator_centered(columns))
             self.table.set_row(self.table.rows - 1, row)
 
 
@@ -67,7 +72,7 @@ if __name__ == "__main__":
         def __init__(self, *args, **kwargs):
             tk.Tk.__init__(self, *args, **kwargs)
 
-            self.table = SimpleTable(self)
+            self.table = SimpleTable(self, read_only=False)
             self.table.pack()
 
             self.table.set_title(["a", "b", "c"])
