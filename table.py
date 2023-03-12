@@ -163,6 +163,15 @@ class Table(tk.Frame):
         for follow_up_row in range(row + 1, self.rows + 1):
             self.widgets[follow_up_row - 1] = self.widgets[follow_up_row]
 
+    def replace_row(self, row:int, row_generator):
+        """
+        Replaces row with another generated row
+        """
+
+        for column in range(len(self.widgets[row])):
+            self.widgets[row][column].destroy()
+
+        self.widgets[row] = row_generator(parent=self, row_position=self.rows)
 
 if __name__ == "__main__":
 
