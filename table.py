@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     class SampleApp(tk.Tk):
         """
-        Sample tkinter app to demonstrate scrolling
+        Sample tkinter app to demonstrate table
         """
 
         def __init__(self, *args, **kwargs):
@@ -131,7 +131,7 @@ if __name__ == "__main__":
             self.table.add_row(get_input_row_generator(3))
             self.table.pack()
             self.label = ttk.Label(
-                self, text="Shrink the window to activate the scrollbar."
+                self, text="Buttons output values to console."
             )
             self.label.pack()
 
