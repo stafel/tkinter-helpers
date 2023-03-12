@@ -30,10 +30,18 @@ class ScrolledFrame(ttk.Frame):
     """
     Frame with scrollbar
     Use interior to add child elements
-    Based on https://web.archive.org/web/20170514022131id_/http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
+    Based on:
+    https://web.archive.org/web/20170514022131id_/http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
     """
 
-    def __init__(self, parent, show_vertical_scrollbar:bool=True, show_horizontal_scrollbar:bool=False, *args, **kwargs):
+    def __init__(
+        self,
+        parent,
+        *args,
+        show_vertical_scrollbar: bool = True,
+        show_horizontal_scrollbar: bool = False,
+        **kwargs,
+    ):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
 
         # create canvas and scrollbar for it
@@ -46,7 +54,11 @@ class ScrolledFrame(ttk.Frame):
         self.show_horizontal_scrollbar(show_horizontal_scrollbar)
 
         self.canvas = tk.Canvas(
-            self, bd=0, highlightthickness=0, yscrollcommand=self.vertical_scrollbar.set, xscrollcommand=self.horizontal_scrollbar.set
+            self,
+            bd=0,
+            highlightthickness=0,
+            yscrollcommand=self.vertical_scrollbar.set,
+            xscrollcommand=self.horizontal_scrollbar.set,
         )
         self.canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
@@ -84,7 +96,7 @@ class ScrolledFrame(ttk.Frame):
         self.interior.bind("<Enter>", self._bind_mousewheel)
         self.interior.bind("<Leave>", self._unbind_mousewheel)
 
-    def show_vertical_scrollbar(self, visible:bool):
+    def show_vertical_scrollbar(self, visible: bool):
         """
         Show or hide vertical scrollbar
         """
@@ -95,7 +107,7 @@ class ScrolledFrame(ttk.Frame):
         else:
             self.vertical_scrollbar.pack_forget()
 
-    def show_horizontal_scrollbar(self, visible:bool):
+    def show_horizontal_scrollbar(self, visible: bool):
         """
         Show or hide horizontal scrollbar
         """

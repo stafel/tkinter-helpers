@@ -20,7 +20,12 @@
 import tkinter as tk
 from tkinter.constants import *
 from scrollframe import ScrolledFrame
-from table import Table, get_title_row_generator, get_readonly_row_generator, get_input_row_generator_centered
+from table import (
+    Table,
+    get_title_row_generator,
+    get_readonly_row_generator,
+    get_input_row_generator_centered,
+)
 
 __doc__ = """
 Simple table for data
@@ -32,7 +37,7 @@ class SimpleTable(ScrolledFrame):
     Simple scrollable table
     """
 
-    def __init__(self, parent, read_only:bool=True):
+    def __init__(self, parent, read_only: bool = True):
         ScrolledFrame.__init__(self, parent)
 
         self.table = Table(self.interior)
