@@ -22,7 +22,7 @@ from tkinter import ttk
 from tkinter.constants import *
 
 __doc__ = """
-Simple table for data
+Table base functionality
 """
 
 
@@ -102,7 +102,7 @@ class Table(tk.Frame):
         Adds a number of rows at the end of the table from generator
         """
 
-        for row in range(number_of_rows):
+        for _ in range(number_of_rows):
             self.add_row(row_generator)
 
     def set(self, row: int, column: int, value):
@@ -128,6 +128,8 @@ class Table(tk.Frame):
         if isinstance(widget, tk.Entry):
             return widget.get()
 
+        return ""
+
     def get_row(self, row: int):
         """
         Returns values as list for row
@@ -137,6 +139,29 @@ class Table(tk.Frame):
         for column in range(len(self.widgets[row])):
             values.append(self.get(row, column))
         return values
+
+    def set_row(self, row: int, values):
+        """
+        Sets cells on row
+        """
+
+        for column, value in enumerate(values):
+            self.set(row, column, value)
+
+    def remove_row(self, row: int):
+        """
+        Deletes row and closes gap
+        """
+
+        for column in range(len(self.widgets[row])):
+            self.widgets[row][column].destroy()
+
+        self.rows -= 1
+        if self.rows <= row:
+            return  # we have no follow up rows to close the list gap
+
+        for follow_up_row in range(row + 1, self.rows + 1):
+            self.widgets[follow_up_row - 1] = self.widgets[follow_up_row]
 
 
 if __name__ == "__main__":
@@ -172,6 +197,13 @@ if __name__ == "__main__":
                 command=lambda: print(self.table.get_row(self.table.rows - 1)),
             )
             self.button_end.pack()
+
+            self.button_del = tk.Button(
+                self,
+                text="delete row 2",
+                command=lambda: self.table.remove_row(2),
+            )
+            self.button_del.pack()
 
     app = SampleApp()
     app.mainloop()
