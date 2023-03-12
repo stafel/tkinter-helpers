@@ -43,29 +43,64 @@ class SimpleTable(ScrolledFrame):
         self.table = Table(self.interior)
         self.table.pack()
 
+        self.table.add_row(get_title_row_generator(0)) # to mark the title row
+
+        self.footer = tk.Frame(self.interior)
+        self.footer.pack(side=BOTTOM)
+
+        self.new_button = tk.Button(self.footer, text="New", command=self._add_row)
+        self.new_button.pack()
+
+        self.right_click_menu = tk.Menu(self.interior)
+        self.right_click_menu.add_command(label="New", command=self._add_row)
+
+        # dynamic bind right mouse to open menu
+        self.interior.bind("<Enter>", lambda event: self.canvas.bind_all("<Button-3>", self._show_menu))
+        self.interior.bind("<Leave>", lambda event: self.canvas.unbind_all("<Button-3>"))
+
         self.read_only = read_only
+        self.new_row_generator = None
+
+    def _show_menu(self, event):
+        #print(event.widget)
+        try:
+            self.right_click_menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.right_click_menu.grab_release()
 
     def set_title(self, title_texts):
         """
         Generates title row with title texts
         """
 
-        self.table.add_row(get_title_row_generator(len(title_texts)))
-        self.table.set_row(self.table.rows - 1, title_texts)
+        self.table.replace_row(0, get_title_row_generator(len(title_texts)))
+        self.table.set_row(0, title_texts)
 
     def set_data(self, data_rows):
         """
         Generates read only rows for data rows
         """
 
-        for row in data_rows:
-            columns = len(row)
+        columns = len(data_rows[0])
+
+        # we define the row generator here to share with the new button
+        def _row_generator():
             if self.read_only:
                 self.table.add_row(get_readonly_row_generator(columns))
             else:
                 self.table.add_row(get_input_row_generator_centered(columns))
+
+        self.new_row_generator = _row_generator
+
+        for row in data_rows:
+            self.new_row_generator()
             self.table.set_row(self.table.rows - 1, row)
 
+    def _add_row(self):
+        if self.new_row_generator is None:
+            return
+
+        self.new_row_generator()
 
 if __name__ == "__main__":
 
