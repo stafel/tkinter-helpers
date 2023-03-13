@@ -31,6 +31,7 @@ __doc__ = """
 Simple table for data
 """
 
+ROW = "row"
 
 class SimpleTable(ScrolledFrame):
     """
@@ -51,10 +52,6 @@ class SimpleTable(ScrolledFrame):
         self.new_button = tk.Button(self.footer, text="New", command=self._add_row)
         self.new_button.pack()
 
-        self.right_click_menu = tk.Menu(self.interior)
-        self.right_click_menu.add_command(label="New", command=self._add_row)
-        self.right_click_menu.add_command(label="Delete", command=self._delete_row)
-
         # dynamic bind right mouse to open menu
         self.interior.bind(
             "<Enter>", lambda event: self.canvas.bind_all("<Button-3>", self._show_menu)
@@ -65,15 +62,24 @@ class SimpleTable(ScrolledFrame):
 
         self.read_only = read_only
         self.new_row_generator = None
+        self.insert_row_generator = None
 
         self.selected_widget = None
 
     def _show_menu(self, event):
         self.selected_widget = event.widget  # save widget for later use in delete
+
+        right_click_menu = tk.Menu(self.interior)
+        right_click_menu.add_command(label="New", command=self._add_row)
+
+        if self.get_selected_row() > 0: # only show delete if user selected valid row
+            right_click_menu.add_command(label="Insert before", command=self._insert_row)
+            right_click_menu.add_command(label="Delete", command=self._delete_row)
+
         try:
-            self.right_click_menu.tk_popup(event.x_root, event.y_root)
+            right_click_menu.tk_popup(event.x_root, event.y_root)
         finally:
-            self.right_click_menu.grab_release()
+            right_click_menu.grab_release()
 
     def set_title(self, title_texts):
         """
@@ -91,17 +97,25 @@ class SimpleTable(ScrolledFrame):
         columns = len(data_rows[0])
 
         # we define the row generator here to share with the new button
-        def _row_generator():
+        def _new_row_generator():
             if self.read_only:
                 self.table.add_row(get_readonly_row_generator(columns))
             else:
                 self.table.add_row(get_input_row_generator_centered(columns))
 
-        self.new_row_generator = _row_generator
+        # also the insert row generator for the context menu
+        def _insert_row_generator(row:int):
+            if self.read_only:
+                self.table.insert_row(row, get_readonly_row_generator(columns))
+            else:
+                self.table.insert_row(row, get_input_row_generator_centered(columns))
+
+        self.new_row_generator = _new_row_generator
+        self.insert_row_generator = _insert_row_generator
 
         for row in data_rows:
             self.new_row_generator()
-            self.table.set_row(self.table.rows - 1, row)
+            self.table.set_row(self.table.get_row_count() - 1, row)
 
     def _add_row(self):
         if self.new_row_generator is None:
@@ -117,9 +131,12 @@ class SimpleTable(ScrolledFrame):
         if self.selected_widget is None:
             return -1
 
-        return (
-            self.selected_widget.grid_info()["row"] - 1
-        )  # need to subtract one to get the right row in the list
+        if ROW in self.selected_widget.grid_info():
+            return (
+                self.selected_widget.grid_info()[ROW] - 1
+            )  # need to subtract one to get the right row in the list
+
+        return -1 # row not found in grid info, user clicked on gap
 
     def _delete_row(self):
         selected_row = self.get_selected_row()
@@ -129,6 +146,16 @@ class SimpleTable(ScrolledFrame):
 
         self.table.remove_row(selected_row)
 
+    def _insert_row(self):
+        if self.new_row_generator is None:
+            return
+
+        selected_row = self.get_selected_row()
+
+        if selected_row < 1:  # prevent insertion before title
+            return
+
+        self.insert_row_generator(selected_row)
 
 if __name__ == "__main__":
 
