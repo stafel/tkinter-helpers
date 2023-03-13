@@ -238,7 +238,9 @@ if __name__ == "__main__":
             self.button_end = tk.Button(
                 self,
                 text="get last row",
-                command=lambda: print(self.table.get_row(self.table.get_row_count() - 1)),
+                command=lambda: print(
+                    self.table.get_row(self.table.get_row_count() - 1)
+                ),
             )
             self.button_end.pack()
 

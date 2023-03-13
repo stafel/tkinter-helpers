@@ -33,15 +33,16 @@ Simple table for data
 
 ROW = "row"
 
-COLOR_UNSELECTED = 'white'
-COLOR_SELECTED = 'deepskyblue'
+COLOR_UNSELECTED = "white"
+COLOR_SELECTED = "deepskyblue"
+
 
 class SimpleTable(ScrolledFrame):
     """
     Simple scrollable table
     """
 
-    def __init__(self, parent, read_only: bool = True, mark_selected_row: bool=True):
+    def __init__(self, parent, read_only: bool = True, mark_selected_row: bool = True):
         ScrolledFrame.__init__(self, parent)
 
         self.table = Table(self.interior)
@@ -56,14 +57,12 @@ class SimpleTable(ScrolledFrame):
         self.new_button.pack()
 
         # dynamic bind right mouse to open menu
-        self.interior.bind(
-            "<Enter>", lambda event: self._bind_mouse_buttons()
-        )
-        self.interior.bind(
-            "<Leave>", lambda event: self._unbind_mouse_buttons()
-        )
+        self.interior.bind("<Enter>", lambda event: self._bind_mouse_buttons())
+        self.interior.bind("<Leave>", lambda event: self._unbind_mouse_buttons())
 
         self.read_only = read_only
+        self.mark_selected_row = mark_selected_row
+
         self.new_row_generator = None
         self.insert_row_generator = None
 
@@ -83,20 +82,24 @@ class SimpleTable(ScrolledFrame):
 
     def _select_widget(self, event):
         old_selected = self.selected_widget
-        self._mark_selected_row(self.color_unselected)
+        if self.mark_selected_row:
+            self._mark_selected_row(self.color_unselected)
         self.selected_widget = event.widget
         if self.get_selected_row() < 1:
-            self.selected_widget = old_selected # new selection invalid, revert
-        self._mark_selected_row(self.color_selected)
+            self.selected_widget = old_selected  # new selection invalid, revert
+        if self.mark_selected_row:
+            self._mark_selected_row(self.color_selected)
 
         if not self.right_click_menu is None:
-            self.right_click_menu.destroy() # we have a menu open, close it
+            self.right_click_menu.destroy()  # we have a menu open, close it
             self.right_click_menu = None
 
     def _show_menu(self, event):
         self._select_widget(event)
 
-        self.right_click_menu = tk.Menu(self.interior, tearoff=0) # hide tearoff line to make subwindow
+        self.right_click_menu = tk.Menu(
+            self.interior, tearoff=0
+        )  # hide tearoff line to make subwindow
         self.right_click_menu.add_command(label="New", command=self._add_row)
 
         if self.get_selected_row() > 0:  # only show delete if user selected valid row
@@ -175,7 +178,7 @@ class SimpleTable(ScrolledFrame):
 
         self.table.remove_row(selected_row)
 
-        self.selected_widget = None # deselect now deleted widget
+        self.selected_widget = None  # deselect now deleted widget
 
     def _insert_row(self):
         if self.new_row_generator is None:
@@ -188,9 +191,9 @@ class SimpleTable(ScrolledFrame):
 
         self.insert_row_generator(selected_row)
 
-    def _mark_row(self, row:int, color):
+    def _mark_row(self, row: int, color):
         for widget in self.table.widgets[row]:
-            widget.configure(bg = color)
+            widget.configure(bg=color)
 
     def _mark_selected_row(self, color):
         selected_row = self.get_selected_row()
