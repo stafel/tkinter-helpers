@@ -156,12 +156,23 @@ class Table(tk.Frame):
         for column in range(len(self.widgets[row])):
             self.widgets[row][column].destroy()
 
-        self.rows -= 1
-        if self.rows <= row:
-            return  # we have no follow up rows to close the list gap
+        for follow_up_row in range(row + 1, self.rows):
+            self.widgets[follow_up_row - 1] = self.widgets[
+                follow_up_row
+            ]  # close gap in table
 
-        for follow_up_row in range(row + 1, self.rows + 1):
-            self.widgets[follow_up_row - 1] = self.widgets[follow_up_row]
+            for widget in self.widgets[
+                follow_up_row - 1
+            ]:  # regrid all widgets to close gap in grid
+                widget_position = widget.grid_info()
+                widget_position[
+                    "row"
+                ] = follow_up_row  # remember tkinter grid begins at one
+                widget.grid_forget()
+                widget.grid(**widget_position)
+
+        self.rows -= 1
+        del self.widgets[self.rows]  # remove double link to last line
 
     def replace_row(self, row: int, row_generator):
         """

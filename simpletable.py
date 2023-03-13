@@ -53,6 +53,7 @@ class SimpleTable(ScrolledFrame):
 
         self.right_click_menu = tk.Menu(self.interior)
         self.right_click_menu.add_command(label="New", command=self._add_row)
+        self.right_click_menu.add_command(label="Delete", command=self._delete_row)
 
         # dynamic bind right mouse to open menu
         self.interior.bind(
@@ -65,8 +66,10 @@ class SimpleTable(ScrolledFrame):
         self.read_only = read_only
         self.new_row_generator = None
 
+        self.selected_widget = None
+
     def _show_menu(self, event):
-        # print(event.widget)
+        self.selected_widget = event.widget  # save widget for later use in delete
         try:
             self.right_click_menu.tk_popup(event.x_root, event.y_root)
         finally:
@@ -105,6 +108,26 @@ class SimpleTable(ScrolledFrame):
             return
 
         self.new_row_generator()
+
+    def get_selected_row(self):
+        """
+        Returns selected row
+        """
+
+        if self.selected_widget is None:
+            return -1
+
+        return (
+            self.selected_widget.grid_info()["row"] - 1
+        )  # need to subtract one to get the right row in the list
+
+    def _delete_row(self):
+        selected_row = self.get_selected_row()
+
+        if selected_row < 1:  # prevent deletion of title
+            return
+
+        self.table.remove_row(selected_row)
 
 
 if __name__ == "__main__":
