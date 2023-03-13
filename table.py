@@ -27,6 +27,7 @@ Table base functionality
 
 ROW = "row"
 
+
 def get_readonly_row_generator(columns: int, **kwargs):
     """
     returns generator method for a read only row consisting of labels
@@ -101,7 +102,9 @@ class Table(tk.Frame):
         Adds new row to table end from generator
         """
 
-        self.widgets.append(row_generator(parent=self, row_position=self.get_row_count()+1))
+        self.widgets.append(
+            row_generator(parent=self, row_position=self.get_row_count() + 1)
+        )
 
     def add_rows(self, number_of_rows: int, row_generator):
         """
@@ -162,16 +165,16 @@ class Table(tk.Frame):
         for column in range(len(self.widgets[row])):
             self.widgets[row][column].destroy()
 
-        del(self.widgets[row])
+        del self.widgets[row]
 
         for follow_up_row in range(row, self.get_row_count()):
             for widget in self.widgets[
                 follow_up_row
             ]:  # regrid all widgets to close gap in grid
                 widget_position = widget.grid_info()
-                widget_position[
-                    ROW
-                ] = follow_up_row + 1  # remember tkinter grid begins at one
+                widget_position[ROW] = (
+                    follow_up_row + 1
+                )  # remember tkinter grid begins at one
                 widget.grid_forget()
                 widget.grid(**widget_position)
 
@@ -185,14 +188,14 @@ class Table(tk.Frame):
                 follow_up_row
             ]:  # regrid all widgets to close gap in grid
                 widget_position = widget.grid_info()
-                widget_position[
-                    ROW
-                ] = follow_up_row + 2 # remember tkinter grid begins at one
+                widget_position[ROW] = (
+                    follow_up_row + 2
+                )  # remember tkinter grid begins at one
                 widget.grid_forget()
                 widget.grid(**widget_position)
 
-        new_row = row_generator(parent=self, row_position=row+1) # insert at grid pos
-        self.widgets.insert(row, new_row) # insert in our table
+        new_row = row_generator(parent=self, row_position=row + 1)  # insert at grid pos
+        self.widgets.insert(row, new_row)  # insert in our table
 
     def replace_row(self, row: int, row_generator):
         """
@@ -202,7 +205,7 @@ class Table(tk.Frame):
         for column in range(len(self.widgets[row])):
             self.widgets[row][column].destroy()
 
-        self.widgets[row] = row_generator(parent=self, row_position=row+1)
+        self.widgets[row] = row_generator(parent=self, row_position=row + 1)
 
 
 if __name__ == "__main__":
@@ -235,7 +238,7 @@ if __name__ == "__main__":
             self.button_end = tk.Button(
                 self,
                 text="get last row",
-                command=lambda: print(self.table.get_row(self.table.rows - 1)),
+                command=lambda: print(self.table.get_row(self.table.get_row_count() - 1)),
             )
             self.button_end.pack()
 

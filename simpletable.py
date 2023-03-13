@@ -33,6 +33,7 @@ Simple table for data
 
 ROW = "row"
 
+
 class SimpleTable(ScrolledFrame):
     """
     Simple scrollable table
@@ -72,8 +73,10 @@ class SimpleTable(ScrolledFrame):
         right_click_menu = tk.Menu(self.interior)
         right_click_menu.add_command(label="New", command=self._add_row)
 
-        if self.get_selected_row() > 0: # only show delete if user selected valid row
-            right_click_menu.add_command(label="Insert before", command=self._insert_row)
+        if self.get_selected_row() > 0:  # only show delete if user selected valid row
+            right_click_menu.add_command(
+                label="Insert before", command=self._insert_row
+            )
             right_click_menu.add_command(label="Delete", command=self._delete_row)
 
         try:
@@ -104,7 +107,7 @@ class SimpleTable(ScrolledFrame):
                 self.table.add_row(get_input_row_generator_centered(columns))
 
         # also the insert row generator for the context menu
-        def _insert_row_generator(row:int):
+        def _insert_row_generator(row: int):
             if self.read_only:
                 self.table.insert_row(row, get_readonly_row_generator(columns))
             else:
@@ -136,7 +139,7 @@ class SimpleTable(ScrolledFrame):
                 self.selected_widget.grid_info()[ROW] - 1
             )  # need to subtract one to get the right row in the list
 
-        return -1 # row not found in grid info, user clicked on gap
+        return -1  # row not found in grid info, user clicked on gap
 
     def _delete_row(self):
         selected_row = self.get_selected_row()
@@ -156,6 +159,7 @@ class SimpleTable(ScrolledFrame):
             return
 
         self.insert_row_generator(selected_row)
+
 
 if __name__ == "__main__":
 
