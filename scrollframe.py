@@ -93,8 +93,8 @@ class ScrolledFrame(ttk.Frame):
         self.canvas.bind("<Configure>", _configure_canvas)
 
         # dynamic bind scroll wheel if mouse over
-        self.interior.bind("<Enter>", self._bind_mousewheel)
-        self.interior.bind("<Leave>", self._unbind_mousewheel)
+        self.interior.bind_all("<Enter>", self._bind_mousewheel)
+        self.interior.bind_all("<Leave>", self._unbind_mousewheel)
 
     def show_vertical_scrollbar(self, visible: bool):
         """
