@@ -157,7 +157,7 @@ class SimpleTable(ScrolledFrame):
 
     def get_selected_row(self):
         """
-        Returns selected row
+        Returns selected row number
         """
 
         if self.selected_widget is None:
@@ -203,6 +203,46 @@ class SimpleTable(ScrolledFrame):
 
         self._mark_row(selected_row, color)
 
+    def get_selcted_row_data(self):
+        """
+        Returns data from selected row as list
+        """
+
+        selected_row = self.get_selected_row()
+
+        data = []
+        if selected_row < 1:
+            return data
+
+        return self.table.get_row(selected_row)
+
+    def get_data(self, skip_empty_rows: bool = True, skip_header: bool = True):
+        """
+        Returns table data as list
+        """
+
+        start_row = 0
+        if skip_header:
+            start_row = 1
+
+        data = []
+        for row in range(start_row, self.table.get_row_count()):
+            row_data = self.table.get_row(row)
+
+            if skip_empty_rows:
+                is_empty = True
+                for cell in row_data:
+                    if cell != "":
+                        is_empty = False
+                        break
+
+                if is_empty:
+                    continue
+
+            data.append(row_data)
+
+        return data
+
 
 if __name__ == "__main__":
 
@@ -221,6 +261,13 @@ if __name__ == "__main__":
             self.table.set_data(
                 [["one", "two", "three"], ["eins", "zwei", "drei"], ["I", "II", "III"]]
             )
+
+            self.button = tk.Button(
+                self,
+                text="print table data",
+                command=lambda: print(self.table.get_data()),
+            )
+            self.button.pack()
 
     app = SampleApp()
     app.mainloop()
